@@ -1,0 +1,58 @@
+# Configurações do Registro para EnergyEstimation\TaggedEnergy
+$regContent1 = @"
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\EnergyEstimation\TaggedEnergy]
+"DisableTaggedEnergyLogging"=dword:00000001
+"TelemetryMaxApplication"=dword:00000000
+"TelemetryMaxTagPerApplication"=dword:00000000
+"@
+
+# Configurações do Registro para EnergyEstimationEnabled
+$regContent2 = @"
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+"EnergyEstimationEnabled"=dword:00000000
+"@
+
+# Configurações do Registro para DXGKrnl
+$regContent3 = @"
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DXGKrnl]
+"MonitorLatencyTolerance"=dword:00000000
+"MonitorRefreshLatencyTolerance"=dword:00000000
+"@
+
+# Configurações do Registro para GpuEnergyDrv
+$regContent4 = @"
+Windows Registry Editor Version 5.00
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GpuEnergyDrv]
+"Start"=dword:00000004
+"@
+
+# Caminho dos arquivos .reg temporários
+$regFilePath1 = [System.IO.Path]::Combine($env:TEMP, 'energy_estimation.reg')
+$regFilePath2 = [System.IO.Path]::Combine($env:TEMP, 'energy_estimation_enabled.reg')
+$regFilePath3 = [System.IO.Path]::Combine($env:TEMP, 'dxgkrnl_settings.reg')
+$regFilePath4 = [System.IO.Path]::Combine($env:TEMP, 'gpu_energy_drv_settings.reg')
+
+# Salva os conteúdos nos arquivos .reg
+$regContent1 | Set-Content -Path $regFilePath1 -Force
+$regContent2 | Set-Content -Path $regFilePath2 -Force
+$regContent3 | Set-Content -Path $regFilePath3 -Force
+$regContent4 | Set-Content -Path $regFilePath4 -Force
+
+# Executa os arquivos .reg usando regedit.exe
+Start-Process "regedit.exe" -ArgumentList "/s `"$regFilePath1`"" -Wait
+Start-Process "regedit.exe" -ArgumentList "/s `"$regFilePath2`"" -Wait
+Start-Process "regedit.exe" -ArgumentList "/s `"$regFilePath3`"" -Wait
+Start-Process "regedit.exe" -ArgumentList "/s `"$regFilePath4`"" -Wait
+
+# Remove os arquivos .reg temporários após a execução
+Remove-Item -Path $regFilePath1 -Force
+Remove-Item -Path $regFilePath2 -Force
+Remove-Item -Path $regFilePath3 -Force
+Remove-Item -Path $regFilePath4 -Force
